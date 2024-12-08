@@ -131,3 +131,40 @@ part1(data)
 
 # ## Part 2
 
+# In part 2, we need to see if eliding a single value from each row would make
+# the report safe.  If that is the case, then the row is actually safe.
+# Let us consider the first row of our data:
+
+sample[1]
+
+# We can generate the list of variations where one element has been 
+# removed using the following construct:
+
+[sample[1][1:end.!=i] for i in 1:length(sample[1])]
+
+# We can determine if these are safe by modifying this slightly:
+
+[is_safe(sample[1][1:end.!=i]) for i in 1:length(sample[1])]
+
+# And we can find out if any value is safe by applying `|` element-wise:
+
+reduce(|, [is_safe(sample[1][1:end.!=i]) for i in 1:length(sample[1])])
+
+# Making a function for this calculation could be done as follows:
+
+function any_safe(row)
+    reduce(|, [is_safe(row[1:end.!=i]) for i in 1:length(row)])
+end
+
+# Now we can write our function for part 2 as:
+
+function part2(data)
+    return sum([any_safe(data[i]) for i in 1:size(data, 1)])
+end
+
+# Running this on the actual data gives us:
+
+part2(data)
+
+# And, as it turns out, `626` is the correct answer for this data set!  Well, on
+# to [Day 3](./day3).

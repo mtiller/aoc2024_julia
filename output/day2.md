@@ -261,6 +261,101 @@ which *is the correct answer*.
 
 ## Part 2
 
+In part 2, we need to see if eliding a single value from each row would make
+the report safe.  If that is the case, then the row is actually safe.
+Let us consider the first row of our data:
+
+````julia
+sample[1]
+````
+
+````
+5-element Vector{Int64}:
+ 7
+ 6
+ 4
+ 2
+ 1
+````
+
+We can generate the list of variations where one element has been
+removed using the following construct:
+
+````julia
+[sample[1][1:end.!=i] for i in 1:length(sample[1])]
+````
+
+````
+5-element Vector{Vector{Int64}}:
+ [6, 4, 2, 1]
+ [7, 4, 2, 1]
+ [7, 6, 2, 1]
+ [7, 6, 4, 1]
+ [7, 6, 4, 2]
+````
+
+We can determine if these are safe by modifying this slightly:
+
+````julia
+[is_safe(sample[1][1:end.!=i]) for i in 1:length(sample[1])]
+````
+
+````
+5-element Vector{Bool}:
+ 1
+ 1
+ 0
+ 1
+ 1
+````
+
+And we can find out if any value is safe by applying `|` element-wise:
+
+````julia
+reduce(|, [is_safe(sample[1][1:end.!=i]) for i in 1:length(sample[1])])
+````
+
+````
+true
+````
+
+Making a function for this calculation could be done as follows:
+
+````julia
+function any_safe(row)
+    reduce(|, [is_safe(row[1:end.!=i]) for i in 1:length(row)])
+end
+````
+
+````
+any_safe (generic function with 1 method)
+````
+
+Now we can write our function for part 2 as:
+
+````julia
+function part2(data)
+    return sum([any_safe(data[i]) for i in 1:size(data, 1)])
+end
+````
+
+````
+part2 (generic function with 1 method)
+````
+
+Running this on the actual data gives us:
+
+````julia
+part2(data)
+````
+
+````
+626
+````
+
+And, as it turns out, `626` is the correct answer for this data set!  Well, on
+to [Day 3](./day3).
+
 ---
 
 *This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl).*
