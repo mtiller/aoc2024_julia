@@ -1,3 +1,7 @@
+````julia
+# Day 1
+````
+
 OK, this is day one of Advent of Code 2024.  I'm creating my solutions in
 Julia. I'm no Julia expert, so this is just good practice for me to sharpen my
 Julia skills.
