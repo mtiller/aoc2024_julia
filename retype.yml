@@ -2,3 +2,6 @@ input: ./output
 output: ./build
 branding:
   title: Advent of Code 2024
+links:
+  - text: Source Code Repository
+    link: https://github.com/mtiller/aoc2024_julia
