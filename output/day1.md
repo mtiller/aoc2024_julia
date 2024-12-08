@@ -332,9 +332,6 @@ part2(sample)
 Hurray!  Now, let's it on our actual data:
 
 ````julia
-using DelimitedFiles
-data = readdlm("day1.txt", Int64)
-
 part2(data)
 ````
 

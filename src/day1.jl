@@ -156,9 +156,6 @@ part2(sample)
 
 # Hurray!  Now, let's it on our actual data:
 
-using DelimitedFiles
-data = readdlm("day1.txt", Int64)
-
 part2(data)
 
 # Excellent, another gold start, the expected answer is indeed `20719933`.  Now on to [Day 2](./day2).

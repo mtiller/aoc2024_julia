@@ -85,4 +85,43 @@ part1(sample)
 
 # ### Working with Actual Data
 
-# Now we need to try this on our actual data:
+# We cannot read the "Red-Nosed Reports" with `readdlm` because it assumes the
+# data in the file is a matrix.  Specifically, it assumes that every row of data
+# has the same number of columns.  This is not the case with the "Red-Nosed
+# Reports".  Instead, we need to read the data in as a vector of vectors.
+
+# To start, here is how we can read each line from a file:
+
+function parsefile(path::AbstractString)
+    return open(path) do file
+        [line for line in eachline(file)]
+    end
+end
+
+lines = parsefile("day2.txt");
+
+# Reading the data like this, we get an array of strings
+# that look like this:
+
+lines[1:10]
+
+# To get our vectors, we just split each line, _e.g.,_
+
+data = [parse.(Int64, split(line)) for line in lines];
+
+# So now the first few entries in our data look like this:
+
+data[1:10]
+
+# Because the "shape" of our data is slightly different (a vector of vectors),
+# we need to rewrite our `part1` function to account for this.  Fortunately,
+# this is a very simple change:
+
+function part1(data)
+    return sum([is_safe(data[i]) for i in 1:size(data, 1)])
+end
+
+part1(data)
+
+# As we see here, our result is that $585$ of the rows are considered "safe"
+# which *is the correct answer*.
