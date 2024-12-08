@@ -1,6 +1,8 @@
-# Day 1
+# Day 1: Historian Hysteria
 
-## Working with Sample Data
+## Part 1
+
+### Working with Sample Data
 
 OK, this is day one of Advent of Code 2024.  I'm creating my solutions in
 Julia. I'm no Julia expert, so this is just good practice for me to sharpen my
@@ -117,7 +119,7 @@ answer.  Now let's write a general function that can take in our original data a
 return this sum to us:
 
 ````julia
-function day1(data)
+function part1(data)
     col1 = sort(data[:, 1])
     col2 = sort(data[:, 2])
     return sum(abs.(col1 .- col2))
@@ -125,15 +127,15 @@ end
 ````
 
 ````
-day1 (generic function with 1 method)
+part1 (generic function with 1 method)
 ````
 
 ...testing this on the test data set gives us:
 
 ````julia
-day1(sample)
+part1(sample)
 
-# Working with Actual Data
+### Working with Actual Data
 ````
 
 ````
@@ -152,7 +154,7 @@ data = readdlm("day1.txt", Int64);
 Using our function to compute the result we get:
 
 ````julia
-day1(data)
+part1(data)
 ````
 
 ````
@@ -162,7 +164,7 @@ day1(data)
 Sure enough, `2,164,381` is the correct answer for day 1!
 
 ````julia
-# Visualization
+### Visualization
 ````
 
 Let's visualize what is going on here.  First, let's plot both of
@@ -172,7 +174,7 @@ the columns...
 using Plots
 plot([col1, col2], label=["Column 1", "Column 2"])
 ````
-![](day1-27.svg)
+![](day1-28.svg)
 
 What we are interested in is the difference between these two data sets.
 So let's break this down into the lower of the two values and the
@@ -213,19 +215,134 @@ Now, let's plot these two values:
 ````julia
 plot(upper, fillrange=lower, fillstyle=:/)
 ````
-![](day1-33.svg)
+![](day1-34.svg)
 
 We can generate a similar plot for our actual data:
 
 ````julia
 plot([sort(data[:, 1]), sort(data[:, 2])], label=["Column 1", "Column 2"])
 ````
-![](day1-35.svg)
+![](day1-36.svg)
 
 So our calculation of `2,164,381` is the sum of the differences between
 these two lines.
 
-OK, now on to [Day 2](./day2)!
+## Part 2
+
+But wait, there is more.  Now we have to compute a *similarity score*.
+
+### Working with Sample Data
+
+Again, we start with the sample data but this time we want to
+compute the similarity score.  Here is the sample data again:
+
+````julia
+sample = [
+    3 4;
+    4 3;
+    2 5;
+    1 3;
+    3 9;
+    3 3
+]
+````
+
+````
+6×2 Matrix{Int64}:
+ 3  4
+ 4  3
+ 2  5
+ 1  3
+ 3  9
+ 3  3
+````
+
+To compute the similarity score we need to take each number on the left, in
+turn, and multiple it by the number of times it appears on the right, _i.e.,_
+
+````julia
+["$(x) * $(count(==(x), sample[:, 2])) = $(x * count(==(x), sample[:, 2]))" for x in sample[:, 1]]
+````
+
+````
+6-element Vector{String}:
+ "3 * 3 = 9"
+ "4 * 1 = 4"
+ "2 * 0 = 0"
+ "1 * 0 = 0"
+ "3 * 3 = 9"
+ "3 * 3 = 9"
+````
+
+The products themselves are just:
+
+````julia
+[x * count(==(x), sample[:, 2]) for x in sample[:, 1]]
+````
+
+````
+6-element Vector{Int64}:
+ 9
+ 4
+ 0
+ 0
+ 9
+ 9
+````
+
+And their sum is:
+
+````julia
+sum([x * count(==(x), sample[:, 2]) for x in sample[:, 1]])
+````
+
+````
+31
+````
+
+And, as the [instructions for Day 2](https://adventofcode.com/2024/day/1#part2) tell us,
+the answer should be $31$.
+
+### Working with Actual Data
+
+Our next step is to write a function that can do this calculation for
+an arbitrary data set.  In Julia, such a function can be written as:
+
+````julia
+function part2(data)
+    return sum([x * count(==(x), data[:, 2]) for x in data[:, 1]])
+end
+````
+
+````
+part2 (generic function with 1 method)
+````
+
+Let's test our function on the sample data just to make sure we got that
+correct:
+
+````julia
+part2(sample)
+````
+
+````
+31
+````
+
+Hurray!  Now, let's it on our actual data:
+
+````julia
+using DelimitedFiles
+data = readdlm("day1.txt", Int64)
+
+part2(data)
+````
+
+````
+20719933
+````
+
+Excellent, another gold start, the expected answer is indeed `20719933`.  Now on to [Day 2](./day2).
 
 ---
 

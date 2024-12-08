@@ -1,6 +1,8 @@
-# # Day 1
+# # Day 1: Historian Hysteria
 
-# ## Working with Sample Data
+# ## Part 1
+
+# ### Working with Sample Data
 
 # OK, this is day one of Advent of Code 2024.  I'm creating my solutions in
 # Julia. I'm no Julia expert, so this is just good practice for me to sharpen my
@@ -50,7 +52,7 @@ sum(abs.(col1 .- col2))
 # answer.  Now let's write a general function that can take in our original data and
 # return this sum to us:
 
-function day1(data)
+function part1(data)
     col1 = sort(data[:, 1])
     col2 = sort(data[:, 2])
     return sum(abs.(col1 .- col2))
@@ -58,9 +60,9 @@ end
 
 # ...testing this on the test data set gives us:
 
-day1(sample)
+part1(sample)
 
-## Working with Actual Data
+### Working with Actual Data
 
 # Voila!  Our function works.  Now let's use the function the compute the solutions
 # for day one.  For _me_, the input data for day 1 can be found in [this file](./day1.txt).
@@ -71,11 +73,11 @@ data = readdlm("day1.txt", Int64);
 
 # Using our function to compute the result we get:
 
-day1(data)
+part1(data)
 
 # Sure enough, `2,164,381` is the correct answer for day 1!
 
-## Visualization 
+### Visualization 
 
 # Let's visualize what is going on here.  First, let's plot both of
 # the columns...
@@ -104,4 +106,59 @@ plot([sort(data[:, 1]), sort(data[:, 2])], label=["Column 1", "Column 2"])
 # So our calculation of `2,164,381` is the sum of the differences between
 # these two lines.
 
-# OK, now on to [Day 2](./day2)!
+# ## Part 2
+
+# But wait, there is more.  Now we have to compute a *similarity score*.
+
+# ### Working with Sample Data
+
+# Again, we start with the sample data but this time we want to 
+# compute the similarity score.  Here is the sample data again:
+
+sample = [
+    3 4;
+    4 3;
+    2 5;
+    1 3;
+    3 9;
+    3 3
+]
+
+# To compute the similarity score we need to take each number on the left, in
+# turn, and multiple it by the number of times it appears on the right, _i.e.,_
+
+["$(x) * $(count(==(x), sample[:, 2])) = $(x * count(==(x), sample[:, 2]))" for x in sample[:, 1]]
+
+# The products themselves are just:
+
+[x * count(==(x), sample[:, 2]) for x in sample[:, 1]]
+
+# And their sum is:
+
+sum([x * count(==(x), sample[:, 2]) for x in sample[:, 1]])
+
+# And, as the [instructions for Day 2](https://adventofcode.com/2024/day/1#part2) tell us, 
+# the answer should be $31$.
+
+# ### Working with Actual Data
+
+# Our next step is to write a function that can do this calculation for 
+# an arbitrary data set.  In Julia, such a function can be written as:
+
+function part2(data)
+    return sum([x * count(==(x), data[:, 2]) for x in data[:, 1]])
+end
+
+# Let's test our function on the sample data just to make sure we got that
+# correct:
+
+part2(sample)
+
+# Hurray!  Now, let's it on our actual data:
+
+using DelimitedFiles
+data = readdlm("day1.txt", Int64)
+
+part2(data)
+
+# Excellent, another gold start, the expected answer is indeed `20719933`.  Now on to [Day 2](./day2).
