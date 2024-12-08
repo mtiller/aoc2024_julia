@@ -1,6 +1,6 @@
-````julia
 # Day 1
-````
+
+## Working with Sample Data
 
 OK, this is day one of Advent of Code 2024.  I'm creating my solutions in
 Julia. I'm no Julia expert, so this is just good practice for me to sharpen my
@@ -132,6 +132,8 @@ day1 (generic function with 1 method)
 
 ````julia
 day1(sample)
+
+# Working with Actual Data
 ````
 
 ````
@@ -158,6 +160,72 @@ day1(data)
 ````
 
 Sure enough, `2,164,381` is the correct answer for day 1!
+
+````julia
+# Visualization
+````
+
+Let's visualize what is going on here.  First, let's plot both of
+the columns...
+
+````julia
+using Plots
+plot([col1, col2], label=["Column 1", "Column 2"])
+````
+![](day1-27.svg)
+
+What we are interested in is the difference between these two data sets.
+So let's break this down into the lower of the two values and the
+upper for the two values:
+
+````julia
+lower = min.(col1, col2)
+````
+
+````
+6-element Vector{Int64}:
+ 1
+ 2
+ 3
+ 3
+ 3
+ 4
+````
+
+and the upper values:
+
+````julia
+upper = max.(col1, col2)
+````
+
+````
+6-element Vector{Int64}:
+ 3
+ 3
+ 3
+ 4
+ 5
+ 9
+````
+
+Now, let's plot these two values:
+
+````julia
+plot(upper, fillrange=lower, fillstyle=:/)
+````
+![](day1-33.svg)
+
+We can generate a similar plot for our actual data:
+
+````julia
+plot([sort(data[:, 1]), sort(data[:, 2])], label=["Column 1", "Column 2"])
+````
+![](day1-35.svg)
+
+So our calculation of `2,164,381` is the sum of the differences between
+these two lines.
+
+OK, now on to [Day 2](./day2)!
 
 ---
 

@@ -1,4 +1,6 @@
-## Day 1
+# # Day 1
+
+# ## Working with Sample Data
 
 # OK, this is day one of Advent of Code 2024.  I'm creating my solutions in
 # Julia. I'm no Julia expert, so this is just good practice for me to sharpen my
@@ -58,6 +60,8 @@ end
 
 day1(sample)
 
+## Working with Actual Data
+
 # Voila!  Our function works.  Now let's use the function the compute the solutions
 # for day one.  For _me_, the input data for day 1 can be found in [this file](./day1.txt).
 # We can read that data into Julia with:
@@ -70,3 +74,34 @@ data = readdlm("day1.txt", Int64);
 day1(data)
 
 # Sure enough, `2,164,381` is the correct answer for day 1!
+
+## Visualization 
+
+# Let's visualize what is going on here.  First, let's plot both of
+# the columns...
+
+using Plots
+plot([col1, col2], label=["Column 1", "Column 2"])
+
+# What we are interested in is the difference between these two data sets.
+# So let's break this down into the lower of the two values and the
+# upper for the two values:
+
+lower = min.(col1, col2)
+
+# and the upper values:
+
+upper = max.(col1, col2)
+
+# Now, let's plot these two values:
+
+plot(upper, fillrange=lower, fillstyle=:/)
+
+# We can generate a similar plot for our actual data:
+
+plot([sort(data[:, 1]), sort(data[:, 2])], label=["Column 1", "Column 2"])
+
+# So our calculation of `2,164,381` is the sum of the differences between
+# these two lines.
+
+# OK, now on to [Day 2](./day2)!

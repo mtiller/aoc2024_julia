@@ -1,4 +1,4 @@
-input: output
-output: build
+input: ./output
+output: ./build
 branding:
   title: Advent of Code 2024
