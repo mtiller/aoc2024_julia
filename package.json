@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "start": "retype serve",
+    "build": "retype build",
+    "serve": "serve build"
+  },
+  "dependencies": {
+    "retypeapp": "^3.6.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
