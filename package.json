@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "gen": "make",
     "start": "retype serve",
     "build": "retype build",
     "serve": "serve build"
