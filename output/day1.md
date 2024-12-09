@@ -134,13 +134,13 @@ part1 (generic function with 1 method)
 
 ````julia
 part1(sample)
-
-### Working with Actual Data
 ````
 
 ````
 11
 ````
+
+### Working with Actual Data
 
 Voila!  Our function works.  Now let's use the function the compute the solutions
 for day one.  For _me_, the input data for day 1 can be found in [this file](./day1.txt).
@@ -163,9 +163,7 @@ part1(data)
 
 Sure enough, `2,164,381` is the correct answer for day 1!
 
-````julia
 ### Visualization
-````
 
 Let's visualize what is going on here.  First, let's plot both of
 the columns...
@@ -174,7 +172,7 @@ the columns...
 using Plots
 plot([col1, col2], label=["Column 1", "Column 2"])
 ````
-![](day1-28.svg)
+![](day1-29.svg)
 
 What we are interested in is the difference between these two data sets.
 So let's break this down into the lower of the two values and the
@@ -215,14 +213,14 @@ Now, let's plot these two values:
 ````julia
 plot(upper, fillrange=lower, fillstyle=:/)
 ````
-![](day1-34.svg)
+![](day1-35.svg)
 
 We can generate a similar plot for our actual data:
 
 ````julia
 plot([sort(data[:, 1]), sort(data[:, 2])], label=["Column 1", "Column 2"])
 ````
-![](day1-36.svg)
+![](day1-37.svg)
 
 So our calculation of `2,164,381` is the sum of the differences between
 these two lines.

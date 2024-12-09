@@ -131,6 +131,8 @@ part1(data)
 
 # ## Part 2
 
+# ### Working with Sample Data
+
 # In part 2, we need to see if eliding a single value from each row would make
 # the report safe.  If that is the case, then the row is actually safe.
 # Let us consider the first row of our data:
@@ -161,6 +163,14 @@ end
 function part2(data)
     return sum([any_safe(data[i]) for i in 1:size(data, 1)])
 end
+
+# Testing this on our sample data gives us:
+
+part2(sample)
+
+# Indeed, it turns out 4 of the rows were safe.
+
+# ### Working with Actual Data
 
 # Running this on the actual data gives us:
 

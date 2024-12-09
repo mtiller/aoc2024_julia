@@ -62,7 +62,7 @@ end
 
 part1(sample)
 
-### Working with Actual Data
+# ### Working with Actual Data
 
 # Voila!  Our function works.  Now let's use the function the compute the solutions
 # for day one.  For _me_, the input data for day 1 can be found in [this file](./day1.txt).
@@ -77,7 +77,7 @@ part1(data)
 
 # Sure enough, `2,164,381` is the correct answer for day 1!
 
-### Visualization 
+# ### Visualization 
 
 # Let's visualize what is going on here.  First, let's plot both of
 # the columns...

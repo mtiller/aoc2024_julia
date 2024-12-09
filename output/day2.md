@@ -261,6 +261,8 @@ which *is the correct answer*.
 
 ## Part 2
 
+### Working with Sample Data
+
 In part 2, we need to see if eliding a single value from each row would make
 the report safe.  If that is the case, then the row is actually safe.
 Let us consider the first row of our data:
@@ -342,6 +344,20 @@ end
 ````
 part2 (generic function with 1 method)
 ````
+
+Testing this on our sample data gives us:
+
+````julia
+part2(sample)
+````
+
+````
+4
+````
+
+Indeed, it turns out 4 of the rows were safe.
+
+### Working with Actual Data
 
 Running this on the actual data gives us:
 
