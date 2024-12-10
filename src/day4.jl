@@ -1,6 +1,20 @@
 # # Day 4: Ceres Search
 
+# ### A Bit of Housekeeping
+
+# We will need the `diag` and `transpose` functions so we need to bring
+# `LinearAlgebra` into scope.
+
+using LinearAlgebra
+
+# For transpose, we need to define how we want a `Char` to be transposed
+# in order for `LinearAlgebra.transpose` to work.
+
+Base.transpose(c::Char) = c
+
 # ## Part 1 
+
+# ### Working with Sample Data
 
 # For this step, we need to find occurrences of the word XMAS
 # in an grid of letters.  Our sample data looks like this:
@@ -18,15 +32,6 @@ MAMMMXMMMM
 MXMXAXMASX
 """;
 
-# We will need the `diag` and `transpose` functions so we need to bring
-# `LinearAlgebra` into scope.
-
-using LinearAlgebra
-
-# For transpose, we need to define how we want a `Char` to be transposed
-# in order for `LinearAlgebra.transpose` to work.
-
-Base.transpose(c::Char) = c
 
 # We can make this into an array of characters with:
 
@@ -123,6 +128,8 @@ xmas(data)
 # ...and `2613` is the correct answer!
 
 # ## Part 2
+
+# ### Working with Sample Data
 
 # It turns out that part 2 may actually be simpler that part 1.
 # For part 2, we only need to consider each 3x3 matrix of characters
