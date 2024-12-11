@@ -214,6 +214,8 @@ end
 
 reorder_sum(sample)
 
+# ### Working with Actual Data
+
 # So now trying it with our real data give us:
 
 reorder_sum(data)
