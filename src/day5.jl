@@ -154,3 +154,68 @@ check_data(data)
 # ...and $5639$ is the correct answer!
 
 # ## Part 2
+
+# For this section we first have to identify all the _incorrectly_ ordered
+# updates.  So we will write a slight variation on a previous function:
+
+function incorrect_updates(queue::PrintQueue)
+    filter(x -> !correctly_ordered(queue.order, x), queue.updates)
+end
+
+# ### Working with Sample Data
+
+incorrect_updates(squeue)
+
+# Our next step will be to try and identify, among a given 
+# sequence of updates, the one that can appear first in the sequence.
+
+function is_first(order::Vector{Tuple{Int64,Int64}}, head::Int64, rest::Vector{Int64})
+    for (first, second) in order
+        fi = findfirst(x -> x == first, rest)
+        if second == head && !isnothing(fi)
+            return false
+        end
+    end
+    return true
+end
+
+# Let's check this function.  We expect $97$ to be the first element, so 
+# let's confirm that it `is_first` returns true:
+
+is_first(squeue.order, 97, squeue.updates[1])
+
+# Now let's write a function that orders a given sequence
+# according to the order rules:
+
+function order_seq(order::Vector{Tuple{Int64,Int64}}, seq::Vector{Int64})
+    if length(seq) == 1
+        return seq
+    end
+    fi = findfirst(x -> is_first(order, x, seq), seq)
+    rest = vcat(seq[1:fi-1], seq[fi+1:end])
+    vcat(seq[fi], order_seq(order, rest))
+end
+
+# So let's test this on the first sequence:
+
+order_seq(squeue.order, incorrect_updates(squeue)[1])
+
+# It turns out `[97, 75, 47, 61, 53]` is the correct answer.  Now let's apply 
+# this to each incorrect sequence and sum the middle elements:
+
+sum([middle_element(order_seq(squeue.order, x)) for x in incorrect_updates(squeue)])
+
+# Putting this all in a function and evaluating it gives us:
+
+function reorder_sum(data)
+    queue = parse_queue(data)
+    sum([middle_element(order_seq(queue.order, x)) for x in incorrect_updates(queue)])
+end
+
+reorder_sum(sample)
+
+# So now trying it with our real data give us:
+
+reorder_sum(data)
+
+# and $5273$ is the correct answer.

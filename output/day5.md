@@ -155,7 +155,7 @@ squeue = parse_queue(sample)
 ````
 
 ````
-Main.var"##284".PrintQueue([(47, 53), (97, 13), (97, 61), (97, 47), (75, 29), (61, 13), (75, 53), (29, 13), (97, 29), (53, 29), (61, 53), (97, 53), (61, 29), (47, 13), (75, 47), (97, 75), (47, 61), (75, 61), (47, 29), (75, 13), (53, 13)], [[75, 47, 61, 53, 29], [97, 61, 53, 29, 13], [75, 29, 13], [75, 97, 47, 61, 53], [61, 13, 29], [97, 13, 75, 29, 47]])
+Main.var"##370".PrintQueue([(47, 53), (97, 13), (97, 61), (97, 47), (75, 29), (61, 13), (75, 53), (29, 13), (97, 29), (53, 29), (61, 53), (97, 53), (61, 29), (47, 13), (75, 47), (97, 75), (47, 61), (75, 61), (47, 29), (75, 13), (53, 13)], [[75, 47, 61, 53, 29], [97, 61, 53, 29, 13], [75, 29, 13], [75, 97, 47, 61, 53], [61, 13, 29], [97, 13, 75, 29, 47]])
 ````
 
 Now we need to write a function to process the queue data be checking if a
@@ -322,6 +322,133 @@ check_data(data)
 ...and $5639$ is the correct answer!
 
 ## Part 2
+
+For this section we first have to identify all the _incorrectly_ ordered
+updates.  So we will write a slight variation on a previous function:
+
+````julia
+function incorrect_updates(queue::PrintQueue)
+    filter(x -> !correctly_ordered(queue.order, x), queue.updates)
+end
+````
+
+````
+incorrect_updates (generic function with 1 method)
+````
+
+### Working with Sample Data
+
+````julia
+incorrect_updates(squeue)
+````
+
+````
+3-element Vector{Vector{Int64}}:
+ [75, 97, 47, 61, 53]
+ [61, 13, 29]
+ [97, 13, 75, 29, 47]
+````
+
+Our next step will be to try and identify, among a given
+sequence of updates, the one that can appear first in the sequence.
+
+````julia
+function is_first(order::Vector{Tuple{Int64,Int64}}, head::Int64, rest::Vector{Int64})
+    for (first, second) in order
+        fi = findfirst(x -> x == first, rest)
+        if second == head && !isnothing(fi)
+            return false
+        end
+    end
+    return true
+end
+````
+
+````
+is_first (generic function with 1 method)
+````
+
+Let's check this function.  We expect $97$ to be the first element, so
+let's confirm that it `is_first` returns true:
+
+````julia
+is_first(squeue.order, 97, squeue.updates[1])
+````
+
+````
+true
+````
+
+Now let's write a function that orders a given sequence
+according to the order rules:
+
+````julia
+function order_seq(order::Vector{Tuple{Int64,Int64}}, seq::Vector{Int64})
+    if length(seq) == 1
+        return seq
+    end
+    fi = findfirst(x -> is_first(order, x, seq), seq)
+    rest = vcat(seq[1:fi-1], seq[fi+1:end])
+    vcat(seq[fi], order_seq(order, rest))
+end
+````
+
+````
+order_seq (generic function with 1 method)
+````
+
+So let's test this on the first sequence:
+
+````julia
+order_seq(squeue.order, incorrect_updates(squeue)[1])
+````
+
+````
+5-element Vector{Int64}:
+ 97
+ 75
+ 47
+ 61
+ 53
+````
+
+It turns out `[97, 75, 47, 61, 53]` is the correct answer.  Now let's apply
+this to each incorrect sequence and sum the middle elements:
+
+````julia
+sum([middle_element(order_seq(squeue.order, x)) for x in incorrect_updates(squeue)])
+````
+
+````
+123
+````
+
+Putting this all in a function and evaluating it gives us:
+
+````julia
+function reorder_sum(data)
+    queue = parse_queue(data)
+    sum([middle_element(order_seq(queue.order, x)) for x in incorrect_updates(queue)])
+end
+
+reorder_sum(sample)
+````
+
+````
+123
+````
+
+So now trying it with our real data give us:
+
+````julia
+reorder_sum(data)
+````
+
+````
+5273
+````
+
+and $5273$ is the correct answer.
 
 ---
 
