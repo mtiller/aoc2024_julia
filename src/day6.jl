@@ -119,6 +119,8 @@ function is_loop(g0)
     dir = (-1, 0)
     ## Compute the size of our grid
     (width, height) = size(grid)
+
+    visited = 0
     ## While the guard is still in the grid...
     while 1 <= x <= height && 1 <= y <= width
         ## Mark the guard's location with an 'X'
@@ -132,6 +134,10 @@ function is_loop(g0)
         if x == x0 && y == y0 && dir == (-1, 0)
             return true
         end
+        if visited > width * height
+            return true
+        end
+        visited += 1
     end
     return false
 end
@@ -169,4 +175,15 @@ end
 
 count_loops(smat)
 
-# 
+# Sure enough, $6$ is the correct answer.
+
+# ### Working with Actual Data
+
+# Now let's run this for our real data:
+
+data = read("./day6.txt", String);
+
+grid = char_mat(data)
+
+count_loops(grid)
+
