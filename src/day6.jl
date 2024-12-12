@@ -41,7 +41,7 @@ smat = char_mat(sample)
 
 # We can compute the size of our grid with:
 
-(width, height) = size(smat)
+(height, width) = size(smat)
 
 # The initial position for the guard is:
 
@@ -57,7 +57,7 @@ function guard_walk(grid)
     ## Set the initial direction to up
     dir = (-1, 0)
     ## Compute the size of our grid
-    (width, height) = size(grid)
+    (height, width) = size(grid)
     ## While the guard is still in the grid...
     while 1 <= x <= height && 1 <= y <= width
         ## Mark the guard's location with an 'X'
@@ -114,30 +114,39 @@ function is_loop(g0)
     grid = copy(g0)
     ## Get the guard's starting position
     (x, y) = Tuple(findfirst(isequal('^'), grid))
-    (x0, y0) = (x, y)
     ## Set the initial direction to up
     dir = (-1, 0)
     ## Compute the size of our grid
-    (width, height) = size(grid)
+    (height, width) = size(grid)
+    ## Record changes in direction
+    turns = Set{String}()
 
-    visited = 0
     ## While the guard is still in the grid...
     while 1 <= x <= height && 1 <= y <= width
         ## Mark the guard's location with an 'X'
         grid[x, y] = 'X'
+        ## Compute what our next location would be moving in the 
+        ## same direction
         (nx, ny) = (x + dir[1], y + dir[2])
+
+        ## If we would run into a wall, 
         if 1 <= nx <= height && 1 <= ny <= width && grid[nx, ny] == '#'
+            ## Construct our current state
+            state = "$(x),$(y),$(dir[1]),$(dir[2])"
+            ## If we have been in this state before, we are in a loop
+            if state in turns
+                return true
+            end
+            ## Otherwise, record this state
+            push!(turns, state)
+            ## Change direction
             dir = (dir[2], -dir[1])
+            ## And compute where we will end up after our turn
             (nx, ny) = (x + dir[1], y + dir[2])
         end
+
+        ## Update our position
         (x, y) = (nx, ny)
-        if x == x0 && y == y0 && dir == (-1, 0)
-            return true
-        end
-        if visited > width * height
-            return true
-        end
-        visited += 1
     end
     return false
 end
@@ -156,26 +165,40 @@ smat
 # how many such cases lead to a loop:
 
 function count_loops(g0)
-    count = 0
+    ## Keep track of the locations of all obstacles that create a loop
+    obstacles = Vector{CartesianIndex{2}}()
+
+    ## Iterate over all positions in the grid
     for loc in pairs(g0)
+        ## Get the character at that location
         c = loc[2]
+        ## And the cartesian index for that location
         (x, y) = Tuple(loc[1])
+        ## Check that there is currently a `.` at that location
         if c == '.'
+            ## Make a copy of the grid
             grid = copy(g0)
+            ## Add a `#` to the copy
             grid[x, y] = '#'
+            ## Check if the grid now has a loop in it
             if is_loop(grid)
-                count += 1
+                ## If so, record the location of the obstacle
+                push!(obstacles, CartesianIndex(x, y))
             end
         end
     end
-    count
+    ## Return the number of loops found
+    obstacles
 end
 
-# OK, let's count our loops:
+# OK, let's determine all the locations where an obstacle would
+# form a loop:
 
 count_loops(smat)
 
-# Sure enough, $6$ is the correct answer.
+# We can see there are six locations.  Not only is that the correct number
+# but these are the correct locations as well (`(9, 2)`, `(7, 4)`, `(9, 4)`,
+# `(8, 7)`, `(8, 8)`, `(10, 8)`).
 
 # ### Working with Actual Data
 
@@ -183,7 +206,10 @@ count_loops(smat)
 
 data = read("./day6.txt", String);
 
-grid = char_mat(data)
+grid = char_mat(data);
 
-count_loops(grid)
+# There are too many locations to print out, but we can 
+# count them:
+
+length(count_loops(grid))
 
