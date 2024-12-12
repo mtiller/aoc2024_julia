@@ -220,4 +220,4 @@ reorder_sum(sample)
 
 reorder_sum(data)
 
-# and $5273$ is the correct answer.
+# and $5273$ is the correct answer.  Now on to [Day 6](./day6).
