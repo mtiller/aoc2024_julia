@@ -6,23 +6,23 @@ Once again, we need to read in a string and create a `Matrix` of `Char`s. So
 once again we need to use the `LinearAlgebra` package And define transposition
 for `Char` types:
 
-```julia
+````julia
 using LinearAlgebra
 Base.transpose(c::Char) = c
-```
+````
 
 Let's also just create a simple function that reads a string and transposes it
 into a `Matrix{Char}` for us:
 
-```julia
+````julia
 function char_mat(str)
     transpose(stack([x for x in split(str, '\n')[1:end-1]]))
 end
-```
+````
 
-```
+````
 char_mat (generic function with 1 method)
-```
+````
 
 ## Part 1
 
@@ -30,7 +30,7 @@ char_mat (generic function with 1 method)
 
 For this round, our sample data looks like this:
 
-```julia
+````julia
 sample = """
 ....#.....
 .........#
@@ -43,15 +43,15 @@ sample = """
 #.........
 ......#...
 """;
-```
+````
 
 The matrix for this is:
 
-```julia
+````julia
 smat = char_mat(sample)
-```
+````
 
-```
+````
 10×10 transpose(::Matrix{Char}) with eltype Char:
  '.'  '.'  '.'  '.'  '#'  '.'  '.'  '.'  '.'  '.'
  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '#'
@@ -63,33 +63,33 @@ smat = char_mat(sample)
  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '#'  '.'
  '#'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'
  '.'  '.'  '.'  '.'  '.'  '.'  '#'  '.'  '.'  '.'
-```
+````
 
 We can compute the size of our grid with:
 
-```julia
+````julia
 (height, width) = size(smat)
-```
+````
 
-```
+````
 (10, 10)
-```
+````
 
 The initial position for the guard is:
 
-```julia
+````julia
 (row, col) = Tuple(findfirst(isequal('^'), smat))
-```
+````
 
-```
+````
 (7, 5)
-```
+````
 
-Let's write a function to walk through our grid. This will mark each space that the
-guard visits with an `X`. We'll continue the walk until the guard leaves
+Let's write a function to walk through our grid.  This will mark each space that the
+guard visits with an `X`.  We'll continue the walk until the guard leaves
 the grid:
 
-```julia
+````julia
 function guard_walk(grid)
     # Get the guard's starting position
     (x, y) = Tuple(findfirst(isequal('^'), grid))
@@ -109,27 +109,27 @@ function guard_walk(grid)
         (x, y) = (nx, ny)
     end
 end
-```
+````
 
-```
+````
 guard_walk (generic function with 1 method)
-```
+````
 
 Now let's let the guard walk the grid:
 
-```julia
+````julia
 guard_walk(smat)
-```
+````
 
 Now let's count the number of `X`s in the grid:
 
-```julia
+````julia
 count(x -> x == 'X', smat)
-```
+````
 
-```
+````
 41
-```
+````
 
 Sure enough, $41$ is the correct answer!
 
@@ -137,7 +137,7 @@ Sure enough, $41$ is the correct answer!
 
 Now we load our actual data:
 
-```julia
+````julia
 data = read("./day6.txt", String);
 
 grid = char_mat(data)
@@ -145,25 +145,23 @@ grid = char_mat(data)
 guard_walk(grid)
 
 count(x -> x == 'X', grid)
-```
+````
 
-```
+````
 5095
-```
+````
 
 ...and $5,095$ is the correct answer!
 
 ## Part 2
 
-### Working with Sample Data
-
 Let's start by resetting our sample data:
 
-```julia
+````julia
 smat = char_mat(sample)
-```
+````
 
-```
+````
 10×10 transpose(::Matrix{Char}) with eltype Char:
  '.'  '.'  '.'  '.'  '#'  '.'  '.'  '.'  '.'  '.'
  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '#'
@@ -175,17 +173,17 @@ smat = char_mat(sample)
  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '#'  '.'
  '#'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'
  '.'  '.'  '.'  '.'  '.'  '.'  '#'  '.'  '.'  '.'
-```
+````
 
-For part 2 we will need to make a variation of our `guard_walk` function. It turns
+For part 2 we will need to make a variation of our `guard_walk` function.  It turns
 out we will have to be able to deal with cases where the guard
-**never leaves the grid**. So, we'll need to detect such a case. What
+**never leaves the grid**.  So, we'll need to detect such a case.  What
 that means, in practice, is that the guard returns to their start location
-facing the same direction. We'll call this new function `is_loop` and we'll
+facing the same direction.  We'll call this new function `is_loop` and we'll
 return true if the guard is in a loop and false if the guard leaves
 the grid.
 
-```julia
+````julia
 function is_loop(g0)
     # Make a copy of the input data so we don't corrupt it.
     grid = copy(g0)
@@ -207,7 +205,7 @@ function is_loop(g0)
         (nx, ny) = (x + dir[1], y + dir[2])
 
         # As long as we run into a wall with our next move,
-        # keep turning right
+        # keep turning right (don't use an `if` here!)
         while 1 <= nx <= height && 1 <= ny <= width && grid[nx, ny] == '#'
             # Construct our current state
             state = "$(x),$(y),$(dir[1]),$(dir[2])"
@@ -228,30 +226,30 @@ function is_loop(g0)
     end
     return false
 end
-```
+````
 
-```
+````
 is_loop (generic function with 1 method)
-```
+````
 
 Now let's test our `is_loop` function works for the normal
 case where the guard leaves the grid:
 
-```julia
+````julia
 is_loop(smat)
-```
+````
 
-```
+````
 false
-```
+````
 
 Let's confirm the original matrix is unchanged:
 
-```julia
+````julia
 smat
-```
+````
 
-```
+````
 10×10 transpose(::Matrix{Char}) with eltype Char:
  '.'  '.'  '.'  '.'  '#'  '.'  '.'  '.'  '.'  '.'
  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '#'
@@ -263,13 +261,13 @@ smat
  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '#'  '.'
  '#'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'  '.'
  '.'  '.'  '.'  '.'  '.'  '.'  '#'  '.'  '.'  '.'
-```
+````
 
-Perfect. Now we need to iterate over every location that currently includes a
-`.` add a '#' there and then see if that forms a loop. We then need to count
+Perfect.  Now we need to iterate over every location that currently includes a
+`.` add a '#' there and then see if that forms a loop.  We then need to count
 how many such cases lead to a loop:
 
-```julia
+````julia
 function count_loops(g0)
     # Keep track of the locations of all obstacles that create a loop
     obstacles = Vector{CartesianIndex{2}}()
@@ -296,20 +294,20 @@ function count_loops(g0)
     # Return the number of loops found
     obstacles
 end
-```
+````
 
-```
+````
 count_loops (generic function with 1 method)
-```
+````
 
 OK, let's determine all the locations where an obstacle would
 form a loop:
 
-```julia
+````julia
 count_loops(smat)
-```
+````
 
-```
+````
 6-element Vector{CartesianIndex{2}}:
  CartesianIndex(9, 2)
  CartesianIndex(7, 4)
@@ -317,9 +315,9 @@ count_loops(smat)
  CartesianIndex(8, 7)
  CartesianIndex(8, 8)
  CartesianIndex(10, 8)
-```
+````
 
-We can see there are six locations. Not only is that the correct number
+We can see there are six locations.  Not only is that the correct number
 but these are the correct locations as well (`(9, 2)`, `(7, 4)`, `(9, 4)`,
 `(8, 7)`, `(8, 8)`, `(10, 8)`).
 
@@ -327,27 +325,31 @@ but these are the correct locations as well (`(9, 2)`, `(7, 4)`, `(9, 4)`,
 
 Now let's run this for our real data:
 
-```julia
+````julia
 data = read("./day6.txt", String);
 
 grid = char_mat(data);
-```
+````
 
 There are too many locations to print out, but we can
 count them:
 
-```julia
+````julia
 length(count_loops(grid))
-```
+````
 
-```
+````
 1933
-```
+````
 
-Hurray, $1933$ is the correct answer! Note, if you
-get 1833, you aren't considering the case where you bump into a
-wall and turn _into another wall._.
+Hurray, $1933$ is the correct answer!  Note, if you get 1833, you aren't
+considering the case where you bump into a wall and turn *into another wall.*.
+
+# Potential Improvements
+
+Use complex numbers for coordinates!  Then rotation because multiplying by 0+j
 
 ---
 
-_This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl)._
+*This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl).*
+

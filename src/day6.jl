@@ -216,3 +216,7 @@ length(count_loops(grid))
 
 # Hurray, $1933$ is the correct answer!  Note, if you get 1833, you aren't
 # considering the case where you bump into a wall and turn *into another wall.*.
+
+# # Potential Improvements
+
+# Use complex numbers for coordinates!  Then rotation because multiplying by 0+j 
