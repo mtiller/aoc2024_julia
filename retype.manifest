@@ -1,6 +1,6 @@
 {
   "version": "3.6.0",
-  "created": "2024-12-12T03:40:17Z",
+  "created": "2024-12-14T02:37:01Z",
   "files": [
     {
       "path": ".nojekyll"
@@ -55,6 +55,12 @@
     },
     {
       "path": "day6/index.html"
+    },
+    {
+      "path": "day7.txt"
+    },
+    {
+      "path": "day7/index.html"
     },
     {
       "path": "index.html"
