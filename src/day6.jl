@@ -129,8 +129,9 @@ function is_loop(g0)
         ## same direction
         (nx, ny) = (x + dir[1], y + dir[2])
 
-        ## If we would run into a wall, 
-        if 1 <= nx <= height && 1 <= ny <= width && grid[nx, ny] == '#'
+        ## As long as we run into a wall with our next move,
+        ## keep turning right (don't use an `if` here!)
+        while 1 <= nx <= height && 1 <= ny <= width && grid[nx, ny] == '#'
             ## Construct our current state
             state = "$(x),$(y),$(dir[1]),$(dir[2])"
             ## If we have been in this state before, we are in a loop
@@ -213,3 +214,5 @@ grid = char_mat(data);
 
 length(count_loops(grid))
 
+# Hurray, $1933$ is the correct answer!  Note, if you get 1833, you aren't
+# considering the case where you bump into a wall and turn *into another wall.*.
