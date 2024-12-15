@@ -380,10 +380,8 @@ function compact2(d)
         # move it there
         if !isnothing(blank) && kstart > spaces[blank][1]
             loc = spaces[blank]
-            for l in 0:space-1
-                data[loc[1]+l] = k
-                data[kstart+l] = nothing
-            end
+            data[loc[1]:(loc[1]+space-1)] = fill(k, space)
+            data[kstart:kend] = fill(nothing, space)
         end
         kend = findprev(x -> x == k - 1, data, kstart + 1)
         spaces = blanks(data)
@@ -492,7 +490,29 @@ render(compact2(decompress(sample)))
 "0 0 9 9 2 1 1 1 7 7 7 . 4 4 . 3 3 3 . . . . 5 5 5 5 . 6 6 6 6 . . . . . 8 8 8 8 . ."
 ````
 
+Now let's confirm our checksum:
+
+````julia
+checksum(compact2(sdecomp))
+````
+
+````
+2858
+````
+
 ### Working with Actual Data
+
+Let's try this all with our real data:
+
+````julia
+checksum(compact2(decompress(data)))
+````
+
+````
+6353648390778
+````
+
+Sure enough, the answer should be $6353648390778$.
 
 ---
 

@@ -174,10 +174,8 @@ function compact2(d)
         ## move it there
         if !isnothing(blank) && kstart > spaces[blank][1]
             loc = spaces[blank]
-            for l in 0:space-1
-                data[loc[1]+l] = k
-                data[kstart+l] = nothing
-            end
+            data[loc[1]:(loc[1]+space-1)] = fill(k, space)
+            data[kstart:kend] = fill(nothing, space)
         end
         kend = findprev(x -> x == k - 1, data, kstart + 1)
         spaces = blanks(data)
@@ -207,4 +205,14 @@ render(sdecomp)
 
 render(compact2(decompress(sample)))
 
+# Now let's confirm our checksum:
+
+checksum(compact2(sdecomp))
+
 # ### Working with Actual Data
+
+# Let's try this all with our real data:
+
+checksum(compact2(decompress(data)))
+
+# Sure enough, the answer should be $6353648390778$.
