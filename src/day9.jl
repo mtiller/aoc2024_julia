@@ -2,6 +2,8 @@
 
 # ## Preliminaries
 
+using BenchmarkTools
+
 # Let's define a function to indicate if a give character represents
 # empty space (for this exercise):
 
@@ -19,10 +21,23 @@ sample = "2333133121414131402"
 # this disk map.
 
 function decompress(data)
-    join([(i % 2 == 1 ? "$(div(i,2))"^parse(Int, c) : "."^parse(Int, c)) for (i, c) in enumerate(data)], "")
+    ret = []
+    for (i, c) in enumerate(data)
+        if i % 2 == 1
+            append!(ret, fill(div(i, 2), parse(Int, c)))
+        else
+            append!(ret, fill(nothing, parse(Int, c)))
+        end
+    end
+    ret
 end
 
 decompress("12345")
+
+# Another important test as is:
+
+decompress("90909")
+
 
 # Now let's use this function on our sample data:
 
@@ -33,55 +48,80 @@ decompress(sample)
 # this reason, we'll break the string into an array which will allow us to do
 # swaps in place.
 
-function compact(data)
-    ## Now break the data into an array
-    w = split(data, "")
+function compact(w)
+    ## Determine the actual number of sectors that represent data
+    n = count(!isnothing, w)
 
-    ## Determine the actual number of characters that represent data
-    n = count(!isempty, w)
-    iters = length(w) - n
+    ## Determine the number of empty sectors
+    empty = length(w) - n
 
-    ## As long as there is an empty space in the first `n` entries
-    ## of the array, we can still compress the data further.
-    while count(isempty, w[1:n]) > 0
-        ## Find the index of the first empty space
-        i = findfirst(isempty, w)
-        ## ...and then the index of the last non-empty space
-        j = findlast(!isempty, w)
-        ## Swap these two
+    ## Find the first empty sector
+    i = findfirst(isnothing, w)
+
+    ## For each empty sector that exists in the data...
+    for k in 1:empty
+        ## Find the last kth last sector
+        j = length(w) - (k - 1)
+        ## If it is empty, skip it
+        if isnothing(w[j])
+            continue
+        end
+        ## Swap i (first empty sector) with j (last non-empty sector)
         w[i], w[j] = w[j], w[i]
+        ## Find the _next_ empty sector
+        i = findnext(isnothing, w, i)
     end
-    ## When we are all done, convert the array back to a string
-    join(w, "")
+    w
 end
 
-@btime compact(decompress(sample))
+compact(decompress(sample))
+
+# Fortunately, the compacted data matches the expected answer:
+#
+# ```
+# 0099811188827773336446555566..............
+# ```
 
 # Now we need to compute the checksum:
 
 function checksum(decompressed)
-    sum([(i - 1) * (c == '.' ? 0 : parse(Int, c)) for (i, c) in enumerate(decompressed)])
+    sum([(i - 1) * (isnothing(c) ? 0 : c) for (i, c) in enumerate(decompressed)])
 end
 
 checksum(compact(decompress(sample)))
 
 # ### Working with Actual Data
 
+# To ensure correctness, let's create a "checksum" that is position independent.
+# We can then use this to ensure that compacting didn't "break" anyting:
+
+function pichecksum(data)
+    sum([isnothing(c) ? 0 : c for c in data])
+end
+
 # Our actual data is quite lengthy, so let's read it from a file:
 
-# data = read("day9.txt", String)[1:end-1];
+data = read("day9.txt", String)[1:end-1];
 
-# # Now let's decompress it:
+# Now let's decompress it:
 
-# decomp = decompress(data);
+decomp = decompress(data);
 
-# # # Then let's compact it:
+# Our position independent checksum is:
 
-# comp = compact(decomp);
+pichecksum(decomp)
 
-# # Finally, let's take the checksum:
+# Then let's compact it:
 
-# checksum(compact(decompress(data)))
+comp = compact(decomp);
+
+# After compression, our position independent checksum is:
+
+pichecksum(comp)
+
+# Finally, let's take the checksum:
+
+checksum(comp)
 
 # ## Part 2
 
