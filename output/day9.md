@@ -322,9 +322,175 @@ checksum(comp)
 6332189866718
 ````
 
+...and the correct answer *is* $6332189866718$.
+
 ## Part 2
 
+For this part, the compacting works differently because we want to keep the
+files together.  So we will attempt to move the highest ID file (_not_ the
+largest file) to left most space of free sectors but *only if possible*.
+
+For this exercise, it will be useful to enumerate all free spaces in terms of their size
+and where they start.
+
+````julia
+function blanks(data)
+    ret = []
+    id = 0
+    i = findfirst(isnothing, data)
+    while i != nothing
+        j = findnext(!isnothing, data, i)
+        if !isnothing(j)
+            push!(ret, (i, j - i))
+            i = findnext(isnothing, data, j)
+        else
+            break
+        end
+    end
+    ret
+end
+````
+
+````
+blanks (generic function with 1 method)
+````
+
+Our compact function then becomes:
+
+````julia
+function compact2(d)
+    # Copy the data
+    data = copy(d)
+    # Find out the largest file id present on the disk
+    maxid = max(filter(!isnothing, data)...)
+    # Find the _end_ of the file with the largest id
+    kend = findlast(x -> x == maxid, data)
+
+    spaces = blanks(data)
+    # Iterate over the file ids from largest to smallest
+    for k in maxid:-1:1
+        # Find the _start_ of the file with id `k`
+        kstart = findprev(x -> x != k, data, kend) + 1
+        # Determine the side of the file
+        space = (kend - kstart) + 1
+        # Find the next blank space that could hold this file
+        blank = findfirst(x -> x[2] >= space, spaces)
+        # If the free space is big enough to accommodate file `k` and
+        # we are moving it to a space that is left of it, then
+        # move it there
+        if !isnothing(blank) && kstart > spaces[blank][1]
+            loc = spaces[blank]
+            for l in 0:space-1
+                data[loc[1]+l] = k
+                data[kstart+l] = nothing
+            end
+        end
+        kend = findprev(x -> x == k - 1, data, kstart + 1)
+        spaces = blanks(data)
+    end
+    return data
+end
+````
+
+````
+compact2 (generic function with 1 method)
+````
+
 ### Working with Sample Data
+
+Let's recompute our decompressed sample data:
+
+````julia
+sdecomp = decompress(sample)
+````
+
+````
+42-element Vector{Any}:
+ 0
+ 0
+  nothing
+  nothing
+  nothing
+ 1
+ 1
+ 1
+  nothing
+  nothing
+  nothing
+ 2
+  nothing
+  nothing
+  nothing
+ 3
+ 3
+ 3
+  nothing
+ 4
+ 4
+  nothing
+ 5
+ 5
+ 5
+ 5
+  nothing
+ 6
+ 6
+ 6
+ 6
+  nothing
+ 7
+ 7
+ 7
+  nothing
+ 8
+ 8
+ 8
+ 8
+ 9
+ 9
+````
+
+First, let's test our `blanks` function:
+
+````julia
+blanks(sdecomp)
+````
+
+````
+8-element Vector{Any}:
+ (3, 3)
+ (9, 3)
+ (13, 3)
+ (19, 1)
+ (22, 1)
+ (27, 1)
+ (32, 1)
+ (36, 1)
+````
+
+Rendering it as a string gives:
+
+````julia
+function render(data)
+    join([isnothing(c) ? "." : string(c) for c in data], " ")
+end
+
+render(sdecomp)
+````
+
+````
+"0 0 . . . 1 1 1 . . . 2 . . . 3 3 3 . 4 4 . 5 5 5 5 . 6 6 6 6 . 7 7 7 . 8 8 8 8 9 9"
+````
+
+Compacting our sample data then gives us:
+
+````julia
+render(compact2(decompress(sample)))
+````
+
+````
+"0 0 9 9 2 1 1 1 7 7 7 . 4 4 . 3 3 3 . . . . 5 5 5 5 . 6 6 6 6 . . . . . 8 8 8 8 . ."
+````
 
 ### Working with Actual Data
 

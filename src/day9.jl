@@ -123,8 +123,88 @@ pichecksum(comp)
 
 checksum(comp)
 
+# ...and the correct answer *is* $6332189866718$.
+
 # ## Part 2
 
+# For this part, the compacting works differently because we want to keep the
+# files together.  So we will attempt to move the highest ID file (_not_ the
+# largest file) to left most space of free sectors but *only if possible*.
+
+# For this exercise, it will be useful to enumerate all free spaces in terms of their size
+# and where they start.
+
+function blanks(data)
+    ret = []
+    id = 0
+    i = findfirst(isnothing, data)
+    while i != nothing
+        j = findnext(!isnothing, data, i)
+        if !isnothing(j)
+            push!(ret, (i, j - i))
+            i = findnext(isnothing, data, j)
+        else
+            break
+        end
+    end
+    ret
+end
+
+# Our compact function then becomes:
+
+function compact2(d)
+    ## Copy the data
+    data = copy(d)
+    ## Find out the largest file id present on the disk
+    maxid = max(filter(!isnothing, data)...)
+    ## Find the _end_ of the file with the largest id
+    kend = findlast(x -> x == maxid, data)
+
+    spaces = blanks(data)
+    ## Iterate over the file ids from largest to smallest
+    for k in maxid:-1:1
+        ## Find the _start_ of the file with id `k`
+        kstart = findprev(x -> x != k, data, kend) + 1
+        ## Determine the side of the file
+        space = (kend - kstart) + 1
+        ## Find the next blank space that could hold this file
+        blank = findfirst(x -> x[2] >= space, spaces)
+        ## If the free space is big enough to accommodate file `k` and
+        ## we are moving it to a space that is left of it, then 
+        ## move it there
+        if !isnothing(blank) && kstart > spaces[blank][1]
+            loc = spaces[blank]
+            for l in 0:space-1
+                data[loc[1]+l] = k
+                data[kstart+l] = nothing
+            end
+        end
+        kend = findprev(x -> x == k - 1, data, kstart + 1)
+        spaces = blanks(data)
+    end
+    return data
+end
+
 # ### Working with Sample Data
+
+# Let's recompute our decompressed sample data:
+
+sdecomp = decompress(sample)
+
+# First, let's test our `blanks` function:
+
+blanks(sdecomp)
+
+# Rendering it as a string gives:
+
+function render(data)
+    join([isnothing(c) ? "." : string(c) for c in data], " ")
+end
+
+render(sdecomp)
+
+# Compacting our sample data then gives us:
+
+render(compact2(decompress(sample)))
 
 # ### Working with Actual Data
