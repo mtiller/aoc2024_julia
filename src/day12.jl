@@ -36,8 +36,27 @@ EEEC
 
 g1 = parse_grid(s1)
 
+function pmap(grid)
+    rows = [join(grid[i, :], "") for i in 1:size(grid, 1)]
+    print(join(rows, "\n"))
+end
+
+function show_status(grid, partial, queue)
+    m = copy(grid[1:25, 1:25])
+    for p in partial
+        m[p] = '#'
+    end
+    for p in queue
+        m[p] = '*'
+    end
+    pmap(m)
+    println()
+    println()
+end
+
 function find_region(loc, grid)
-    partial = Set(CartesianIndex[loc])
+    partial = Set{CartesianIndex}()
+    push!(partial, loc)
     base = grid[loc]
 
     queue = [loc]
@@ -47,7 +66,7 @@ function find_region(loc, grid)
         push!(partial, head)
         queue = queue[2:end]
         for n in neighbors(head, grid)
-            if grid[n] == base && !(n in partial)
+            if grid[n] == base && !(n in partial) && !(n in queue)
                 push!(queue, n)
             end
         end
@@ -57,15 +76,15 @@ end
 
 function find_regions(grid)
     regions = []
-    status = fill(0, size(grid))
+    status = fill(false, size(grid))
     for loc in CartesianIndices(grid)
-        if status[loc] === 1
+        if status[loc]
             continue
         end
         partial = find_region(loc, grid)
         push!(regions, partial)
         for p in partial
-            status[p] = 1
+            status[p] = true
         end
     end
     regions
@@ -103,7 +122,9 @@ VVIIICJJEE
 MIIIIIJJEE
 MIIISIJEEE
 MMMISSJEEE
-""")
+""");
+
+# The score for `g2` should be $1930$:
 
 score(g2)
 
@@ -112,6 +133,10 @@ score(g2)
 data = read("day12.txt", String);
 
 # Now, let's compute the score for our actual data:
+
+grid = parse_grid(data)
+
+# 
 
 score(parse_grid(data))
 
