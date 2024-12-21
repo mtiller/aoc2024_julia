@@ -196,28 +196,33 @@ function count_edges(side)
 end
 
 function region_price(region, grid)
-    base = grid[collect(region)[1]]
     area = length(region)
-    sides = 0
-    minrow = min([x[1] for x in collect(region)]...)
-    mincol = min([x[2] for x in collect(region)]...)
-    maxrow = max([x[1] for x in collect(region)]...)
-    maxcol = max([x[2] for x in collect(region)]...)
-    (height, width) = size(grid)
-
-    for row in minrow:maxrow
-        top_edge = [grid[row, col] === base && (row === height || grid[row+1, col] !== base) for col in mincol:maxcol]
-        bottom_edge = [grid[row, col] === base && (row === 1 || grid[row-1, col] !== base) for col in mincol:maxcol]
-        sides += count_edges(top_edge) + count_edges(bottom_edge)
+    corners = 0
+    for loc in region
+        u = CartesianIndex(loc[1] - 1, loc[2])
+        d = CartesianIndex(loc[1] + 1, loc[2])
+        l = CartesianIndex(loc[1], loc[2] - 1)
+        r = CartesianIndex(loc[1], loc[2] + 1)
+        ul = CartesianIndex(loc[1] - 1, loc[2] - 1)
+        ur = CartesianIndex(loc[1] - 1, loc[2] + 1)
+        dl = CartesianIndex(loc[1] + 1, loc[2] - 1)
+        dr = CartesianIndex(loc[1] + 1, loc[2] + 1)
+        us = checkbounds(Bool, grid, u) && grid[u] === grid[loc]
+        ds = checkbounds(Bool, grid, d) && grid[d] === grid[loc]
+        ls = checkbounds(Bool, grid, l) && grid[l] === grid[loc]
+        rs = checkbounds(Bool, grid, r) && grid[r] === grid[loc]
+        uls = checkbounds(Bool, grid, ul) && grid[ul] === grid[loc]
+        urs = checkbounds(Bool, grid, ur) && grid[ur] === grid[loc]
+        dls = checkbounds(Bool, grid, dl) && grid[dl] === grid[loc]
+        drs = checkbounds(Bool, grid, dr) && grid[dr] === grid[loc]
+        for c in [!us && !ls, !us && !rs, !ds && !ls, !ds && !rs, us && ls && !uls, us && rs && !urs, ds && ls && !dls, ds && rs && !drs]
+            if c
+                corners += 1
+            end
+        end
     end
-
-    for col in mincol:maxcol
-        right_edge = [grid[row, col] === base && (col === width || grid[row+1, col+1] !== base) for row in minrow:mincol]
-        left_edge = [grid[row, col] === base && (col === 1 || grid[row, col-1] !== base) for row in minrow:mincol]
-        sides += count_edges(left_edge) + count_edges(right_edge)
-    end
-    println("area = $(area), sides = $(sides)")
-    area * sides
+    println("area = $(area), corners = $(corners)")
+    area * corners
 end
 
 function price(grid)
@@ -237,10 +242,72 @@ price(g1)
 ````
 
 ````
-70
+80
+````
+
+We expect the price to fence this grid to be $436$:
+
+````julia
+price(parse_grid("""OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO
+"""))
+````
+
+````
+436
+````
+
+This one should be $236$:
+
+````julia
+price(parse_grid("""EEEEE
+EXXXX
+EEEEE
+EXXXX
+EEEEE
+"""))
+````
+
+````
+236
+````
+
+Finally, this one should be $1206$:
+
+````julia
+price(parse_grid("""RRRRIICCFF
+RRRRIICCCF
+VVRRRCCFFF
+VVRCCCJFFF
+VVVVCJJCFE
+VVIVCCJJEE
+VVIIICJJEE
+MIIIIIJJEE
+MIIISIJEEE
+MMMISSJEEE
+"""))
+````
+
+````
+1206
 ````
 
 ### Working with Actual Data
+
+Using this to price our real data yields:
+
+````julia
+price(grid)
+````
+
+````
+834828
+````
+
+...and $834828$ is the correct answer!
 
 ---
 
