@@ -73,10 +73,10 @@ sm = parse_machines(sample)
 
 ````
 4-element Vector{Any}:
- Main.var"##307".Machine(94, 34, 22, 67, 8400, 5400)
- Main.var"##307".Machine(26, 66, 67, 21, 12748, 12176)
- Main.var"##307".Machine(17, 86, 84, 37, 7870, 6450)
- Main.var"##307".Machine(69, 23, 27, 71, 18641, 10279)
+ Main.var"##312".Machine(94, 34, 22, 67, 8400, 5400)
+ Main.var"##312".Machine(26, 66, 67, 21, 12748, 12176)
+ Main.var"##312".Machine(17, 86, 84, 37, 7870, 6450)
+ Main.var"##312".Machine(69, 23, 27, 71, 18641, 10279)
 ````
 
 For each machine, we need to solve the following *integer* equation:
@@ -192,9 +192,53 @@ Woohoo! the cost is, in fact, $35729$ tokens.
 
 ## Part 2
 
-### Working with Sample Data
+For the second part, we need to adjust the prize locations by $10000000000000$ units.
+Can do this pretty easily by just transforming the machine data:
+
+````julia
+function adjust_machine(m::Machine)
+    Machine(m.ax, m.ay, m.bx, m.by, m.px + 10000000000000, m.py + 10000000000000)
+end
+````
+
+````
+adjust_machine (generic function with 1 method)
+````
+
+If our cost function makes this adjustment, we get:
+
+````julia
+function cost(data)
+    machines = [adjust_machine(m) for m in parse_machines(data)]
+    cost = 0
+    for m in machines
+        t = tokens(m)
+        if !isnothing(t)
+            (na, nb) = t
+            cost += na * 3 + nb
+        end
+    end
+    cost
+end
+````
+
+````
+cost (generic function with 1 method)
+````
 
 ### Working with Actual Data
+
+Now the cost (in tokens) to win all possible prizes is:
+
+````julia
+cost(data)
+````
+
+````
+88584689879723
+````
+
+Fortunately, the costs matches the expected answer of $88584689879723$ tokens.
 
 ---
 

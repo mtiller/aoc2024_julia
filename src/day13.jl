@@ -140,6 +140,33 @@ cost(data)
 
 # ## Part 2
 
-# ### Working with Sample Data
+# For the second part, we need to adjust the prize locations by $10000000000000$ units.
+# Can do this pretty easily by just transforming the machine data:
+
+function adjust_machine(m::Machine)
+    Machine(m.ax, m.ay, m.bx, m.by, m.px + 10000000000000, m.py + 10000000000000)
+end
+
+# If our cost function makes this adjustment, we get:
+
+function cost(data)
+    machines = [adjust_machine(m) for m in parse_machines(data)]
+    cost = 0
+    for m in machines
+        t = tokens(m)
+        if !isnothing(t)
+            (na, nb) = t
+            cost += na * 3 + nb
+        end
+    end
+    cost
+end
 
 # ### Working with Actual Data
+
+# Now the cost (in tokens) to win all possible prizes is:
+
+cost(data)
+
+# Fortunately, the costs matches the expected answer of $88584689879723$ tokens.
+
