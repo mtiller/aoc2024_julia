@@ -134,7 +134,7 @@ data = read("day12.txt", String);
 
 # Now, let's compute the score for our actual data:
 
-grid = parse_grid(data)
+grid = parse_grid(data);
 
 # 
 
@@ -142,6 +142,56 @@ score(parse_grid(data))
 
 # ## Part 2
 
+# For this section, we compute the price of each region using a different
+# algorithm.
+
+function count_edges(side)
+    count = 0
+    status = false
+    for s in side
+        if status && !s
+            count += 1
+        end
+        status = s
+    end
+    if status
+        count += 1
+    end
+    count
+end
+
+function region_price(region, grid)
+    base = grid[collect(region)[1]]
+    area = length(region)
+    sides = 0
+    minrow = min([x[1] for x in collect(region)]...)
+    mincol = min([x[2] for x in collect(region)]...)
+    maxrow = max([x[1] for x in collect(region)]...)
+    maxcol = max([x[2] for x in collect(region)]...)
+    (height, width) = size(grid)
+
+    for row in minrow:maxrow
+        top_edge = [grid[row, col] === base && (row === height || grid[row+1, col] !== base) for col in mincol:maxcol]
+        bottom_edge = [grid[row, col] === base && (row === 1 || grid[row-1, col] !== base) for col in mincol:maxcol]
+        sides += count_edges(top_edge) + count_edges(bottom_edge)
+    end
+
+    for col in mincol:maxcol
+        right_edge = [grid[row, col] === base && (col === width || grid[row+1, col+1] !== base) for row in minrow:mincol]
+        left_edge = [grid[row, col] === base && (col === 1 || grid[row, col-1] !== base) for row in minrow:mincol]
+        sides += count_edges(left_edge) + count_edges(right_edge)
+    end
+    println("area = $(area), sides = $(sides)")
+    area * sides
+end
+
+function price(grid)
+    regions = find_regions(grid)
+    sum([region_price(region, grid) for region in regions])
+end
+
 # ### Working with Sample Data
+
+price(g1)
 
 # ### Working with Actual Data
