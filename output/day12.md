@@ -2,16 +2,16 @@
 
 ## Preliminaries
 
-````julia
+```julia
 function parse_grid(data)
     transpose(stack([x for x in split(data, '\n')[1:end-1]]))
 end
 Base.transpose(c::Char) = c
-````
+```
 
 Reusing this handle function from day 10:
 
-````julia
+```julia
 function neighbors(loc, grid)
     spots = [
         CartesianIndex(loc[1] - 1, loc[2]),
@@ -21,11 +21,11 @@ function neighbors(loc, grid)
     ]
     filter(x -> checkbounds(Bool, grid, x), spots)
 end
-````
+```
 
-````
+```
 neighbors (generic function with 1 method)
-````
+```
 
 ## Part 1
 
@@ -35,7 +35,7 @@ determine the cost.
 
 ### Working with Sample Data
 
-````julia
+```julia
 s1 = """
 AAAA
 BBCD
@@ -113,23 +113,23 @@ function score(grid)
     regions = find_regions(grid)
     sum([prod(region_stats(region, grid)) for region in regions])
 end
-````
+```
 
-````
+```
 score (generic function with 1 method)
-````
+```
 
 If we score grid 1, we should get $140$:
 
-````julia
+```julia
 score(g1)
-````
+```
 
-````
+```
 140
-````
+```
 
-````julia
+```julia
 g2 = parse_grid("""
 RRRRIICCFF
 RRRRIICCCF
@@ -142,44 +142,44 @@ MIIIIIJJEE
 MIIISIJEEE
 MMMISSJEEE
 """);
-````
+```
 
 The score for `g2` should be $1930$:
 
-````julia
+```julia
 score(g2)
-````
+```
 
-````
+```
 1930
-````
+```
 
 ### Working with Actual Data
 
-````julia
+```julia
 data = read("day12.txt", String);
-````
+```
 
 Now, let's compute the score for our actual data:
 
-````julia
+```julia
 grid = parse_grid(data);
-````
+```
 
-````julia
+```julia
 score(parse_grid(data))
-````
+```
 
-````
+```
 1381056
-````
+```
 
 ## Part 2
 
 For this section, we compute the price of each region using a different
 algorithm.
 
-````julia
+```julia
 function count_edges(side)
     count = 0
     status = false
@@ -229,55 +229,55 @@ function price(grid)
     regions = find_regions(grid)
     sum([region_price(region, grid) for region in regions])
 end
-````
+```
 
-````
+```
 price (generic function with 1 method)
-````
+```
 
 ### Working with Sample Data
 
-````julia
+```julia
 price(g1)
-````
+```
 
-````
+```
 80
-````
+```
 
 We expect the price to fence this grid to be $436$:
 
-````julia
+```julia
 price(parse_grid("""OOOOO
 OXOXO
 OOOOO
 OXOXO
 OOOOO
 """))
-````
+```
 
-````
+```
 436
-````
+```
 
 This one should be $236$:
 
-````julia
+```julia
 price(parse_grid("""EEEEE
 EXXXX
 EEEEE
 EXXXX
 EEEEE
 """))
-````
+```
 
-````
+```
 236
-````
+```
 
 Finally, this one should be $1206$:
 
-````julia
+```julia
 price(parse_grid("""RRRRIICCFF
 RRRRIICCCF
 VVRRRCCFFF
@@ -289,27 +289,26 @@ MIIIIIJJEE
 MIIISIJEEE
 MMMISSJEEE
 """))
-````
+```
 
-````
+```
 1206
-````
+```
 
 ### Working with Actual Data
 
 Using this to price our real data yields:
 
-````julia
+```julia
 price(grid)
-````
+```
 
-````
+```
 834828
-````
+```
 
 ...and $834828$ is the correct answer!
 
 ---
 
-*This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl).*
-
+_This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl)._
