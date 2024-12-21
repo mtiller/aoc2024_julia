@@ -37,17 +37,17 @@ EEEC
 g1 = parse_grid(s1)
 
 function find_region(loc, grid)
-    partial = fill(0, size(grid))
+    partial = Set(CartesianIndex[loc])
     base = grid[loc]
 
     queue = [loc]
 
     while length(queue) > 0
         head = queue[1]
-        partial[head] = 1
+        push!(partial, head)
         queue = queue[2:end]
         for n in neighbors(head, grid)
-            if grid[n] == base && partial[n] == 0
+            if grid[n] == base && !(n in partial)
                 push!(queue, n)
             end
         end
@@ -59,25 +59,23 @@ function find_regions(grid)
     regions = []
     status = fill(0, size(grid))
     for loc in CartesianIndices(grid)
-        if status[loc] == 1
+        if status[loc] === 1
             continue
         end
         partial = find_region(loc, grid)
-        println("Adding region $partial")
         push!(regions, partial)
-        status = status + partial
+        for p in partial
+            status[p] = 1
+        end
     end
     regions
 end
 
-function region_stats(region)
-    area = count(x -> x === 1, region)
+function region_stats(region, grid)
+    area = length(region)
     perimeter = 0
-    for loc in CartesianIndices(region)
-        if region[loc] == 0
-            continue
-        end
-        edges = 4 - length(filter(x -> region[x] === 1, neighbors(loc, region)))
+    for loc in region
+        edges = 4 - count(x -> (x in region), neighbors(loc, grid))
         perimeter += edges
     end
     (area, floor(Int, perimeter))
@@ -85,7 +83,7 @@ end
 
 function score(grid)
     regions = find_regions(grid)
-    sum([prod(region_stats(region)) for region in regions])
+    sum([prod(region_stats(region, grid)) for region in regions])
 end
 
 # If we score grid 1, we should get $140$:
@@ -111,7 +109,7 @@ score(g2)
 
 # ### Working with Actual Data
 
-data = read("day12.txt", String)
+data = read("day12.txt", String);
 
 # Now, let's compute the score for our actual data:
 
